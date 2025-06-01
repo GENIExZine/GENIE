@@ -146,6 +146,41 @@
     input.addEventListener("keydown", function(e) {
       if (e.key === "Enter") sendMessage();
     });
-  </script>
+  
+  <script>
+  const apiUrl = "https://api.example.com/v1/chat"; // Replace with actual API endpoint
+  const apiKey = "xai-mm590qg2YqivOr4inOZuVj2Kx1ADUPpZiDCqqjBEeS6cEh9rvT61Vugtvik8SxeDA0TY30lgONudWJ4V";
+
+  async function sendMessage() {
+    const prompt = input.value.trim();
+    if (!prompt) return;
+
+    appendMessage("You", prompt);
+    input.value = "";
+    appendMessage("GENIE", "<span class='loading'></span>");
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          max_tokens: 100
+        })
+      });
+
+      const data = await res.json();
+      chatBox.innerHTML = chatBox.innerHTML.replace("<span class='loading'></span>", "");
+      appendMessage("GENIE", data.response || JSON.stringify(data));
+    } catch (err) {
+      chatBox.innerHTML = chatBox.innerHTML.replace("<span class='loading'></span>", "");
+      appendMessage("GENIE", "Oops! Something went wrong.");
+      console.error(err);
+    }
+  }
+    </script>
 </body>
 </html>
