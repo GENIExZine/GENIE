@@ -1,0 +1,1 @@
+console.log("Gaming E-Store loaded successfully.");
