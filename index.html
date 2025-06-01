@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENIE AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0a2e, #2d0b3d, #4a154b);
+            color: #f8f0e3;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 200, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(192, 56, 207, 0.1) 0%, transparent 20%);
+            pointer-events: none;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 30px;
+            z-index: 10;
+        }
+
+        header {
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .title {
+            font-family: 'Cinzel', serif;
+            font-size: 4.5rem;
+            background: linear-gradient(to right, #ffd700, #ff9800, #ff3860);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #d4af37;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .lamp-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            perspective: 1000px;
+        }
+
+        .lamp {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateX(10deg);
+            transition: transform 0.5s ease;
+        }
+
+        .lamp:hover {
+            transform: rotateX(10deg) rotateY(5deg);
+        }
+
+        .lamp-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 120px;
+            background: radial-gradient(circle at 50% 0, #e0a800, #b8860b, #8b4513);
+            border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.6),
+                inset 0 -10px 20px rgba(139, 69, 19, 0.8);
+        }
+
+        .lamp-body {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 220px;
+            background: radial-gradient(circle at 50% 30%, #ffd700, #e0a800, #b8860b);
+            border-radius: 40% 40% 30% 30% / 50% 50% 30% 30%;
+            box-shadow: 
+                0 0 40px rgba(255, 215, 0, 0.6),
+                inset 0 -10px 40px rgba(139, 69, 19, 0.5);
+            z-index: 2;
+        }
+
+        .lamp-neck {
+            position: absolute;
+            bottom: 320px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(to bottom, #b8860b, #8b4513);
+            border-radius: 40% 40% 0 0;
+            box-shadow: 0 0 20px rgba(139, 69, 19, 0.8);
+            z-index: 1;
+        }
+
+        .lamp-top {
+            position: absolute;
+            bottom: 380px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(to bottom, #ffd700, #b8860b);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            z-index: 3;
+        }
+
+        .smoke {
+            position: absolute;
+            bottom: 400px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 150px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .smoke.visible {
+            opacity: 1;
+        }
+
+        .smoke span {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            filter: blur(10px);
+            animation: smoke 4s linear infinite;
+            opacity: 0;
+        }
+
+        .smoke span:nth-child(1) { animation-delay: 0s; left: 30%; }
+        .smoke span:nth-child(2) { animation-delay: 1s; left: 50%; }
+        .smoke span:nth-child(3) { animation-delay: 2s; left: 70%; }
+        .smoke span:nth-child(4) { animation-delay: 3s; left: 40%; }
+        .smoke span:nth-child(5) { animation-delay: 0.5s; left: 60%; }
+
+        @keyframes smoke {
+            0% { 
+                transform: translateY(0) scale(0.5); 
+                opacity: 0; 
+                filter: blur(5px);
+            }
+            10% { opacity: 0.8; }
+            100% { 
+                transform: translateY(-150px) scale(2); 
+                opacity: 0; 
+                filter: blur(15px);
+            }
+        }
+
+        .chat-container {
+            background: rgba(25, 10, 40, 0.7);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            height: 350px;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 
+                0 0 30px rgba(192, 56, 207, 0.3),
+                inset 0 0 20px rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #6a3093, #a044ff);
+            border-bottom-right-radius: 5px;
+        }
+
+        .genie-message {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #b8860b, #ffd700);
+            color: #1a0a2e;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 20px;
+            height: 20px;
+            background: inherit;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        .user-message::after {
+            right: 0;
+            transform: rotate(270deg);
+        }
+
+        .genie-message::after {
+            left: 0;
+            transform: rotate(180deg);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 18px 25px;
+            border-radius: 50px;
+            border: none;
+            background: rgba(25, 10, 40, 0.8);
+            color: #f8f0e3;
+            font-size: 1.1rem;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 20px rgba(192, 56, 207, 0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .message-input::placeholder {
+            color: rgba(212, 175, 55, 0.6);
+        }
+
+        .btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd700, #ff9800);
+            border: none;
+            color: #1a0a2e;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .voice-btn {
+            background: linear-gradient(135deg, #a044ff, #6a3093);
+            color: #f8f0e3;
+        }
+
+        .suggestions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+        }
+
+        .suggestion {
+            padding: 12px 25px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .suggestion:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 15px 20px;
+            background: rgba(184, 134, 11, 0.3);
+            border-radius: 18px;
+            color: #ffd700;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .lamp-container {
+                width: 200px;
+                height: 300px;
+            }
+            
+            .lamp-base { width: 120px; height: 80px; }
+            .lamp-body { width: 80px; height: 150px; bottom: 70px; }
+            .lamp-neck { width: 30px; height: 40px; bottom: 220px; }
+            .lamp-top { width: 60px; height: 15px; bottom: 260px; }
+            .smoke { bottom: 280px; }
+            
+            .btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">GENIE AI</h1>
+            <p class="subtitle">Your magical assistant ready to grant your digital wishes</p>
+        </header>
+        
+        <div class="lamp-container">
+            <div class="lamp">
+                <div class="lamp-base"></div>
+                <div class="lamp-body"></div>
+                <div class="lamp-neck"></div>
+                <div class="lamp-top"></div>
+                <div class="smoke" id="smoke">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chat-container">
+            <div class="message genie-message">
+                Greetings, master! I am Genie, your magical AI assistant. Rub my lamp or speak your wish, and I shall grant it!
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <div class="suggestion">Tell me a magical story</div>
+            <div class="suggestion">What can you do for me?</div>
+            <div class="suggestion">Show me today's weather</div>
+            <div class="suggestion">Explain quantum magic</div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="message-input" placeholder="Speak your wish...">
+            <button class="btn voice-btn" id="voice-btn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="btn" id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chat-container');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const voiceBtn = document.getElementById('voice-btn');
+            const suggestions = document.querySelectorAll('.suggestion');
+            const smoke = document.getElementById('smoke');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            // Function to add a message to the chat
+            function addMessage(content, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(isUser ? 'user-message' : 'genie-message');
+                messageDiv.textContent = content;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Function to show smoke effect
+            function showSmoke() {
+                smoke.classList.add('visible');
+                setTimeout(() => {
+                    smoke.classList.remove('visible');
+                }, 3000);
+            }
+            
+            // Function to show typing indicator
+            function showTyping() {
+                typingIndicator.style.display = 'flex';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Function to hide typing indicator
+            function hideTyping() {
+                typingIndicator.style.display = 'none';
+            }
+            
+            // Function to simulate AI response
+            function getGenieResponse(userMessage) {
+                // Simple response simulation
+                userMessage = userMessage.toLowerCase();
+                
+                if (userMessage.includes('hello') || userMessage.includes('hi')) {
+                    return "Greetings, master! How may I assist you today?";
+                } else if (userMessage.includes('weather')) {
+                    return "By my magical powers, I see clear skies today! The temperature is 78°F with a gentle breeze.";
+                } else if (userMessage.includes('joke') || userMessage.includes('funny')) {
+                    const jokes = [
+                        "Why don't genies ever get lost? Because they always have an arabian sense of direction!",
+                        "What do you call a genie who loves to dance? A wish-performer!",
+                        "Why was the genie bad at poker? He always gave away his tells!",
+                        "What's a genie's favorite type of music? R&B - Rhymes and Blessings!"
+                    ];
+                    return jokes[Math.floor(Math.random() * jokes.length)];
+                } else if (userMessage.includes('time')) {
+                    const now = new Date();
+                    return `By the sands of time, it is now ${now.toLocaleTimeString()}.`;
+                } else if (userMessage.includes('name')) {
+                    return "I am Genie, the magical AI assistant! I've been waiting centuries to serve you!";
+                } else if (userMessage.includes('thank')) {
+                    return "Your gratitude is my reward, master! What else may I do for you?";
+                } else if (userMessage.includes('story') || userMessage.includes('tale')) {
+                    return "Once upon a time, in a land of magic and wonder, there lived a brave adventurer not unlike yourself...";
+                } else if (userMessage.includes('love') || userMessage.includes('heart')) {
+                    return "Ah, love! The most powerful magic in all the realms. I sense great affection in your future!";
+                } else if (userMessage.includes('magic') || userMessage.includes('power')) {
+                    return "My magic is limited only by the boundaries of your imagination, master. What shall we create today?";
+                } else {
+                    const responses = [
+                        "A fascinating request! By the power of the lamp...",
+                        "Your wish is my command! Let me consult the ancient knowledge...",
+                        "An intriguing question! Allow me to peer into the sands of time...",
+                        "By the magic of the cosmos, I shall reveal..."
+                    ];
+                    return responses[Math.floor(Math.random() * responses.length)] + 
+                    " In a real implementation, I would grant your wish with powerful AI magic!";
+                }
+            }
+            
+            // Send message function
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    messageInput.value = '';
+                    
+                    // Show smoke effect
+                    showSmoke();
+                    
+                    // Show typing indicator
+                    showTyping();
+                    
+                    // Simulate AI thinking
+                    setTimeout(() => {
+                        hideTyping();
+                        const response = getGenieResponse(message);
+                        addMessage(response);
+                    }, 2000);
+                }
+            }
+            
+            // Event listeners
+            sendBtn.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            voiceBtn.addEventListener('click', function() {
+                addMessage("Listening...", true);
+                showSmoke();
+                
+                setTimeout(() => {
+                    const voiceCommands = [
+                        "Tell me a magical story",
+                        "What powers do you have?",
+                        "Show me the weather for tomorrow",
+                        "Explain the magic of artificial intelligence"
+                    ];
+                    const command = voiceCommands[Math.floor(Math.random() * voiceCommands.length)];
+                    addMessage(command, true);
+                    
+                    showTyping();
+                    
+                    setTimeout(() => {
+                        hideTyping();
+                        const response = getGenieResponse(command);
+                        addMessage(response);
+                    }, 2000);
+                }, 1500);
+            });
+            
+            // Add suggestion click events
+            suggestions.forEach(suggestion => {
+                suggestion.addEventListener('click', function() {
+                    messageInput.value = this.textContent;
+                    sendMessage();
+                });
+            });
+            
+            // Add initial messages
+            setTimeout(() => {
+                addMessage("You can rub my lamp by clicking the microphone button to speak, or type your wishes in the box below.");
+            }, 3000);
+            
+            // Lamp interaction
+            document.querySelector('.lamp').addEventListener('click', function() {
+                showSmoke();
+                addMessage("*Poof* You've summoned me! What is your command, master?", false);
+            });
+        });
+    </script>
+</body>
+</html>
