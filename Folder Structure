@@ -1,0 +1,11 @@
+gaming-store/
+│
+├── static/
+│   ├── style.css
+│   └── script.js
+│
+├── templates/
+│   └── index.html
+│
+├── app.py
+└── requirements.txt
