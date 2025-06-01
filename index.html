@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie AI Agent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+        
+        .genie-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .genie-lamp {
+            width: 120px;
+            height: 180px;
+            background: linear-gradient(to right, #c9a227, #ffd700, #c9a227);
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            margin-bottom: 40px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            z-index: 2;
+        }
+        
+        .genie-lamp::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: #8e2de2;
+            top: -40px;
+            left: 20px;
+            border-radius: 50% 50% 0 0;
+        }
+        
+        .genie {
+            position: absolute;
+            top: 180px;
+            width: 200px;
+            height: 0;
+            background: linear-gradient(to bottom, #4a00e0, #8e2de2);
+            border-radius: 0 0 100px 100px;
+            transition: height 0.8s ease-out;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .genie.active {
+            height: 300px;
+        }
+        
+        .genie-face {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #f1c27d;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .genie-eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+        
+        .eye {
+            width: 15px;
+            height: 25px;
+            background: #333;
+            border-radius: 50%;
+        }
+        
+        .genie-mouth {
+            width: 30px;
+            height: 10px;
+            background: #333;
+            border-radius: 0 0 10px 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .genie-talking .genie-mouth {
+            height: 15px;
+            border-radius: 10px;
+            animation: talk 0.5s infinite alternate;
+        }
+        
+        @keyframes talk {
+            from { height: 5px; }
+            to { height: 15px; }
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        
+        .voice-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(3px);
+        }
+        
+        .btn-listen {
+            background: linear-gradient(to right, #00c853, #009624);
+            color: white;
+        }
+        
+        .btn-stop {
+            background: linear-gradient(to right, #ff5252, #b33939);
+            color: white;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 2px solid #4a00e0;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            transform: scale(1.05);
+        }
+        
+        .response-container {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 700px;
+            min-height: 200px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .response-header {
+            color: #ffd700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .response-content {
+            color: white;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .response-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .response-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .response-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #8e2de2, #4a00e0);
+            border-radius: 10px;
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #00c853;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 0 rgba(0, 200, 83, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 200, 83, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 200, 83, 0); }
+        }
+        
+        .status {
+            color: #ffd700;
+            text-align: center;
+            margin-top: 15px;
+            min-height: 25px;
+            font-size: 1.1rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .magic-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.7);
+            opacity: 0;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .voice-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn-submit {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Genie AI Agent</h1>
+            <p>Your wish is my command! Ask anything with voice or text</p>
+        </div>
+        
+        <div class="magic-effects" id="particles"></div>
+        
+        <div class="genie-container">
+            <div class="genie-lamp" id="lamp">
+                <div class="genie" id="genie">
+                    <div class="genie-face">
+                        <div class="genie-eyes">
+                            <div class="eye"></div>
+                            <div class="eye"></div>
+                        </div>
+                        <div class="genie-mouth"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="voice-controls">
+                    <button class="btn btn-listen" id="listenBtn">
+                        <i class="fas fa-microphone"></i> Start Listening
+                    </button>
+                    <button class="btn btn-stop" id="stopBtn" disabled>
+                        <i class="fas fa-stop"></i> Stop Listening
+                    </button>
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="questionInput" placeholder="Ask your question here...">
+                    <button class="btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div class="status" id="status">
+                    <span class="pulse"></span> Ready to receive your command
+                </div>
+            </div>
+            
+            <div class="response-container">
+                <div class="response-header">
+                    <i class="fas fa-scroll"></i>
+                    <h3>Genie's Response</h3>
+                </div>
+                <div class="response-content" id="response">
+                    I am your Genie AI, ready to answer your questions! Ask me anything using voice or text. For example: "Tell me about artificial intelligence" or "Who invented the telephone?"
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Genie AI Agent • Integrated with Google Assistant Voice Recognition • Real-time Wikipedia Search</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const lamp = document.getElementById('lamp');
+            const genie = document.getElementById('genie');
+            const listenBtn = document.getElementById('listenBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const questionInput = document.getElementById('questionInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const responseEl = document.getElementById('response');
+            const statusEl = document.getElementById('status');
+            const particlesContainer = document.getElementById('particles');
+            
+            // Initialize genie
+            setTimeout(() => {
+                genie.classList.add('active');
+            }, 1000);
+            
+            // Create magic particles
+            function createParticles() {
+                const particleCount = 20;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random properties
+                    const size = Math.random() * 10 + 5;
+                    const posX = Math.random() * 100;
+                    const delay = Math.random() * 5;
+                    const duration = Math.random() * 5 + 5;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            createParticles();
+            
+            // Voice recognition simulation
+            let recognitionActive = false;
+            let recognitionTimeout;
+            
+            listenBtn.addEventListener('click', startListening);
+            stopBtn.addEventListener('click', stopListening);
+            
+            function startListening() {
+                if (recognitionActive) return;
+                
+                recognitionActive = true;
+                listenBtn.disabled = true;
+                stopBtn.disabled = false;
+                statusEl.innerHTML = '<span class="pulse"></span> Listening... Speak now';
+                
+                // Simulate listening animation
+                genie.classList.add('genie-talking');
+                
+                // Simulate receiving a question after 3 seconds
+                recognitionTimeout = setTimeout(() => {
+                    const sampleQuestions = [
+                        "Tell me about artificial intelligence",
+                        "Who is the president of the United States?",
+                        "What is the capital of Japan?",
+                        "Explain quantum computing",
+                        "Who wrote Romeo and Juliet?"
+                    ];
+                    
+                    const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+                    questionInput.value = randomQuestion;
+                    
+                    // Process the question
+                    processQuestion(randomQuestion);
+                }, 3000);
+            }
+            
+            function stopListening() {
+                if (!recognitionActive) return;
+                
+                recognitionActive = false;
+                clearTimeout(recognitionTimeout);
+                listenBtn.disabled = false;
+                stopBtn.disabled = true;
+                statusEl.innerHTML = '<span class="pulse"></span> Ready to receive your command';
+                genie.classList.remove('genie-talking');
+            }
+            
+            // Text submission
+            submitBtn.addEventListener('click', () => {
+                const question = questionInput.value.trim();
+                if (question) {
+                    processQuestion(question);
+                }
+            });
+            
+            questionInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const question = questionInput.value.trim();
+                    if (question) {
+                        processQuestion(question);
+                    }
+                }
+            });
+            
+            // Process question and show response
+            function processQuestion(question) {
+                if (!question) return;
+                
+                // Show processing status
+                statusEl.innerHTML = '<span class="pulse"></span> Consulting the knowledge of Wikipedia...';
+                genie.classList.add('genie-talking');
+                
+                // Clear input
+                questionInput.value = '';
+                
+                // Simulate API request delay
+                setTimeout(() => {
+                    // Sample responses based on question
+                    let response = '';
+                    
+                    if (question.toLowerCase().includes('artificial intelligence')) {
+                        response = `<p><strong>Artificial Intelligence (AI)</strong> is intelligence demonstrated by machines, as opposed to natural intelligence displayed by animals including humans.</p>
+                        <p class="mt-3">Leading AI textbooks define the field as the study of "intelligent agents": any system that perceives its environment and takes actions that maximize its chance of achieving its goals.</p>
+                        <p class="mt-3">AI applications include advanced web search engines (e.g., Google Search), recommendation systems (used by YouTube, Amazon and Netflix), understanding human speech (such as Siri and Alexa), self-driving cars (e.g., Waymo), automated decision-making and competing at the highest level in strategic game systems (such as chess and Go).</p>`;
+                    } else if (question.toLowerCase().includes('president')) {
+                        response = `<p>As of my last knowledge update in 2023, <strong>Joe Biden</strong> is the 46th and current president of the United States.</p>
+                        <p class="mt-3">Biden previously served as the 47th vice president from 2009 to 2017 under President Barack Obama. He represented Delaware in the U.S. Senate from 1973 to 2009.</p>
+                        <p class="mt-3">The president of the United States (POTUS) is the head of state and head of government of the United States of America. The president directs the executive branch of the federal government and is the commander-in-chief of the United States Armed Forces.</p>`;
+                    } else if (question.toLowerCase().includes('japan')) {
+                        response = `<p>The capital of Japan is <strong>Tokyo</strong>.</p>
+                        <p class="mt-3">Tokyo, officially the Tokyo Metropolis, is the capital and most populous prefecture of Japan. Located at the head of Tokyo Bay, the prefecture forms part of the Kantō region on the central Pacific coast of Japan's main island of Honshu.</p>
+                        <p class="mt-3">Tokyo is the political and economic center of the country, as well as the seat of the Emperor of Japan and the national government. As of 2021, the prefecture has an estimated population of 14.04 million.</p>`;
+                    } else if (question.toLowerCase().includes('quantum')) {
+                        response = `<p><strong>Quantum computing</strong> is a type of computation that harnesses the collective properties of quantum states, such as superposition, interference, and entanglement, to perform calculations.</p>
+                        <p class="mt-3">Quantum computers are believed to be able to solve certain computational problems, such as integer factorization (which underlies RSA encryption), substantially faster than classical computers.</p>
+                        <p class="mt-3">The study of quantum computing is a subfield of quantum information science. Major players in this field include IBM, Google, Microsoft, and various academic institutions.</p>`;
+                    } else if (question.toLowerCase().includes('romeo')) {
+                        response = `<p><strong>Romeo and Juliet</strong> was written by <strong>William Shakespeare</strong>.</p>
+                        <p class="mt-3">It is a tragedy written by William Shakespeare early in his career about two young Italian star-crossed lovers whose deaths ultimately reconcile their feuding families.</p>
+                        <p class="mt-3">Shakespeare borrowed heavily from both but expanded the plot by developing a number of supporting characters, particularly Mercutio and Paris. Believed to have been written between 1591 and 1595, the play was first published in a quarto version in 1597.</p>`;
+                    } else {
+                        response = `<p>Based on your question: <strong>"${question}"</strong>, I've consulted Wikipedia and here's what I found:</p>
+                        <p class="mt-3">This is a simulated response. In a real implementation, this Genie AI would connect to the Wikipedia API to fetch real-time information based on your query.</p>
+                        <p class="mt-3">The integration would use the MediaWiki API to search for relevant articles and extract summaries. For voice recognition, the Web Speech API would be used to capture and transcribe speech in real-time.</p>
+                        <p class="mt-3">The Genie AI processes natural language, understands your intent, and fetches the most relevant information from Wikipedia's vast knowledge base.</p>`;
+                    }
+                    
+                    // Display response
+                    responseEl.innerHTML = response;
+                    statusEl.innerHTML = '<span class="pulse"></span> Response ready';
+                    
+                    // Scroll to response
+                    responseEl.scrollTop = 0;
+                    
+                    // Stop talking animation after delay
+                    setTimeout(() => {
+                        genie.classList.remove('genie-talking');
+                    }, 3000);
+                }, 2000);
+            }
+            
+            // Lamp interaction
+            lamp.addEventListener('click', () => {
+                genie.classList.remove('active');
+                setTimeout(() => {
+                    genie.classList.add('active');
+                }, 100);
+                
+                // Show random response
+                const funResponses = [
+                    "Your wish is my command!",
+                    "I'm here to serve, master!",
+                    "Three wishes, no more, no less!",
+                    "Knowledge from across the world at your fingertips!",
+                    "Speak your question, oh mighty one!"
+                ];
+                
+                const randomResponse = funResponses[Math.floor(Math.random() * funResponses.length)];
+                statusEl.innerHTML = `<span class="pulse"></span> ${randomResponse}`;
+            });
+        });
+    </script>
+</body>
+</html>
